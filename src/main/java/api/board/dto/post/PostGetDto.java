@@ -1,5 +1,6 @@
 package api.board.dto.post;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,9 +10,9 @@ import lombok.Setter;
 @Setter
 @Builder
 public class PostGetDto {
-    @NotEmpty
+    @NotBlank
     private String title;
-    @NotEmpty
+    @NotBlank
     private String content;
     private Long viewCount;
     private Long likeCount;

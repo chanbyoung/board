@@ -1,5 +1,6 @@
 package api.board.dto.post;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,8 +8,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PostUpdateDto {
-    @NotEmpty
+    @NotBlank
     private String title;
-    @NotEmpty
+    @NotBlank
     private String content;
 }
