@@ -1,10 +1,14 @@
 package api.board.dto.post;
 
+import api.board.entity.Comment;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -14,6 +18,8 @@ public class PostGetDto {
     private String title;
     @NotBlank
     private String content;
+
+    private List<Comment> commentList;
     private Long viewCount;
     private Long likeCount;
 

@@ -1,5 +1,6 @@
 package api.board.controller;
 
+import api.board.dto.comment.CommentAddDto;
 import api.board.dto.post.PostAddDto;
 import api.board.dto.post.PostGetDto;
 import api.board.dto.post.PostUpdateDto;
@@ -46,5 +47,14 @@ public class PostController {
     @DeleteMapping("/{postId}")
     public ResponseEntity<String> deletePost(@PathVariable Long postId) {
         return new ResponseEntity<>(postService.deletePost(postId));
+    }
+
+    @PostMapping("/{postId}/comment")
+    public ResponseEntity<String> addComment(@PathVariable Long postId, @RequestBody CommentAddDto commentAddDto) {
+        HttpStatus httpStatus = postService.addComment(postId, commentAddDto);
+        if (httpStatus.equals(HttpStatus.NOT_FOUND)) {
+            return new ResponseEntity<>("이미 삭제된 게시글입니다.",httpStatus);
+        }
+        return new ResponseEntity<>(httpStatus);
     }
 }
