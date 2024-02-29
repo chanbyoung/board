@@ -1,14 +1,15 @@
 package api.board.service;
 
 import api.board.dto.comment.CommentAddDto;
-import api.board.dto.post.PostAddDto;
-import api.board.dto.post.PostGetDto;
-import api.board.dto.post.PostUpdateDto;
+import api.board.dto.post.*;
 import api.board.entity.Comment;
 import api.board.entity.Post;
 import api.board.repository.CommentRepository;
+import api.board.repository.DslPostRepository;
 import api.board.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,7 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class PostService {
     private final PostRepository postRepository;
+    private final DslPostRepository dslPostRepository;
     private final CommentRepository commentRepository;
 
     @Transactional
@@ -34,6 +36,18 @@ public class PostService {
         Post savePost = postRepository.save(post);
         return savePost.getId();
     }
+    public Page<PostsGetDto> getPosts(Pageable pageable, PostSearchContent postSearchContent) {
+        return dslPostRepository.getPosts(pageable, postSearchContent).map(this::convertToDto);
+    }
+
+    private PostsGetDto convertToDto(Post post) {
+        return PostsGetDto.builder()
+                .id(post.getId())
+                .title(post.getTitle())
+                .likeCount(post.getLikeCount())
+                .viewCount(post.getViewCount()).build();
+    }
+
 
     public PostGetDto getPost(Long postId) {
         Optional<Post> findPost = postRepository.findById(postId);
@@ -87,4 +101,6 @@ public class PostService {
         commentRepository.save(comment);
         return HttpStatus.OK;
     }
+
+
 }

@@ -1,13 +1,14 @@
 package api.board.controller;
 
 import api.board.dto.comment.CommentAddDto;
-import api.board.dto.post.PostAddDto;
-import api.board.dto.post.PostGetDto;
-import api.board.dto.post.PostUpdateDto;
+import api.board.dto.post.*;
 import api.board.entity.Post;
 import api.board.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,11 @@ public class PostController {
 
     private final PostService postService;
 
+    @GetMapping
+    public ResponseEntity<Page<PostsGetDto>> getPosts(@PageableDefault Pageable pageable,@RequestBody(required = false) PostSearchContent postSearchContent) {
+        Page<PostsGetDto> posts = postService.getPosts(pageable, postSearchContent);
+        return ResponseEntity.ok(posts);
+    }
     @PostMapping
     public ResponseEntity<Long> addPost(@RequestBody PostAddDto postAddDto) {
         Long postId = postService.addPost(postAddDto);
