@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CommentAddDto {
+public class CommentDto {
     @NotBlank
     private String content;
 }

@@ -1,5 +1,6 @@
 package api.board.entity;
 
+import api.board.dto.comment.CommentDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,4 +22,8 @@ public class Comment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="post_id")
     private Post post;
+
+    public void updateComment(CommentDto commentDto) {
+        this.content = commentDto.getContent();
+    }
 }

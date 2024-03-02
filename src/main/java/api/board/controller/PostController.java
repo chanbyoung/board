@@ -1,8 +1,7 @@
 package api.board.controller;
 
-import api.board.dto.comment.CommentAddDto;
+import api.board.dto.comment.CommentDto;
 import api.board.dto.post.*;
-import api.board.entity.Post;
 import api.board.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -56,11 +55,31 @@ public class PostController {
     }
 
     @PostMapping("/{postId}/comment")
-    public ResponseEntity<String> addComment(@PathVariable Long postId, @RequestBody CommentAddDto commentAddDto) {
-        HttpStatus httpStatus = postService.addComment(postId, commentAddDto);
+    public ResponseEntity<String> addComment(@PathVariable Long postId, @RequestBody CommentDto commentDto) {
+        HttpStatus httpStatus = postService.addComment(postId, commentDto);
         if (httpStatus.equals(HttpStatus.NOT_FOUND)) {
             return new ResponseEntity<>("이미 삭제된 게시글입니다.",httpStatus);
         }
         return new ResponseEntity<>(httpStatus);
     }
+
+    @PatchMapping("/{postId}/comment/{commentId}")
+    public ResponseEntity<String> updateComment(@PathVariable Long commentId, @RequestBody CommentDto commentDto) {
+        HttpStatus httpStatus = postService.updateComment(commentId, commentDto);
+        if (httpStatus.equals(HttpStatus.NOT_FOUND)) {
+            return new ResponseEntity<>("이미 삭제된 댓글입니다.",httpStatus);
+        }
+        return new ResponseEntity<>(httpStatus);
+    }
+
+    @DeleteMapping("/{postId}/comment/{commentId}")
+    public ResponseEntity<String> deleteComment(@PathVariable Long commentId) {
+        HttpStatus httpStatus = postService.deleteComment(commentId);
+        if (httpStatus.equals(HttpStatus.NOT_FOUND)) {
+            return new ResponseEntity<>("이미 삭제된 댓글입니다.",httpStatus);
+        }
+        return new ResponseEntity<>(httpStatus);
+    }
+
+
 }

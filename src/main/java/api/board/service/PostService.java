@@ -1,6 +1,6 @@
 package api.board.service;
 
-import api.board.dto.comment.CommentAddDto;
+import api.board.dto.comment.CommentDto;
 import api.board.dto.post.*;
 import api.board.entity.Comment;
 import api.board.entity.Post;
@@ -89,18 +89,37 @@ public class PostService {
     }
 
     @Transactional
-    public HttpStatus addComment(Long postId, CommentAddDto commentAddDto) {
+    public HttpStatus addComment(Long postId, CommentDto commentDto) {
         Optional<Post> findPost = postRepository.findById(postId);
         if (findPost.isEmpty()) {
             return HttpStatus.NOT_FOUND;
         }
         Comment comment = Comment.builder()
                 .post(findPost.get())
-                .content(commentAddDto.getContent())
+                .content(commentDto.getContent())
                 .build();
         commentRepository.save(comment);
         return HttpStatus.OK;
     }
 
+    @Transactional
+    public HttpStatus updateComment(Long commentId, CommentDto commentDto) {
+        Optional<Comment> findComment = commentRepository.findById(commentId);
+        if (findComment.isEmpty()) {
+            return HttpStatus.NOT_FOUND;
+        }
+        findComment.get().updateComment(commentDto);
+        return HttpStatus.OK;
+    }
+    @Transactional
+    public HttpStatus deleteComment(Long commentId) {
+        Optional<Comment> findComment = commentRepository.findById(commentId);
+        if (findComment.isPresent()) {
+            commentRepository.delete(findComment.get());
+            return HttpStatus.OK;
+        }
 
+        return HttpStatus.NOT_FOUND;
+
+    }
 }
