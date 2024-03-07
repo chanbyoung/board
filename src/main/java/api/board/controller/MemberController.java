@@ -2,6 +2,7 @@ package api.board.controller;
 
 import api.board.dto.member.SignDto;
 import api.board.dto.security.JwtToken;
+import api.board.security.SecurityUtil;
 import api.board.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,6 @@ public class MemberController {
 
     @PostMapping("/test")
     public String test() {
-        return "success";
+        return SecurityUtil.getCurrentUsername();
     }
 }
