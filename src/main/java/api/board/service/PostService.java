@@ -27,25 +27,11 @@ public class PostService {
 
     @Transactional
     public Long addPost(PostAddDto postAddDto) {
-        Post post = Post.builder()
-                .title(postAddDto.getTitle())
-                .content(postAddDto.getContent())
-                .likeCount(0L)
-                .viewCount(0L)
-                .build();
-        Post savePost = postRepository.save(post);
+        Post savePost = postRepository.save(postAddDto.toEntity());
         return savePost.getId();
     }
     public Page<PostsGetDto> getPosts(Pageable pageable, PostSearchContent postSearchContent) {
-        return dslPostRepository.getPosts(pageable, postSearchContent).map(this::convertToDto);
-    }
-
-    private PostsGetDto convertToDto(Post post) {
-        return PostsGetDto.builder()
-                .id(post.getId())
-                .title(post.getTitle())
-                .likeCount(post.getLikeCount())
-                .viewCount(post.getViewCount()).build();
+        return dslPostRepository.getPosts(pageable, postSearchContent).map(PostsGetDto::toDto);
     }
 
 
@@ -54,13 +40,7 @@ public class PostService {
         if (findPost.isPresent()) {
             Post post = findPost.get();
             List<Comment> findComment = commentRepository.findCommentByPost(post);
-            return PostGetDto.builder()
-                    .title(post.getTitle())
-                    .content(post.getContent())
-                    .commentList(findComment)
-                    .viewCount(post.getViewCount())
-                    .likeCount(post.getLikeCount())
-                    .build();
+            return PostGetDto.toDto(post, findComment);
         }
         return null;
     }
@@ -94,11 +74,7 @@ public class PostService {
         if (findPost.isEmpty()) {
             return HttpStatus.NOT_FOUND;
         }
-        Comment comment = Comment.builder()
-                .post(findPost.get())
-                .content(commentDto.getContent())
-                .build();
-        commentRepository.save(comment);
+        commentRepository.save(commentDto.toEntity(findPost.get()));
         return HttpStatus.OK;
     }
 

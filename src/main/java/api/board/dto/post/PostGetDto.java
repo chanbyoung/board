@@ -1,6 +1,7 @@
 package api.board.dto.post;
 
 import api.board.entity.Comment;
+import api.board.entity.Post;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;
@@ -23,4 +24,14 @@ public class PostGetDto {
     private Long viewCount;
     private Long likeCount;
 
+
+    static public PostGetDto toDto(Post post, List<Comment> commentList) {
+        return PostGetDto.builder()
+                .title(post.getTitle())
+                .content(post.getContent())
+                .commentList(commentList)
+                .viewCount(post.getViewCount())
+                .likeCount(post.getLikeCount())
+                .build();
+    }
 }
