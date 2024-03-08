@@ -1,5 +1,7 @@
 package api.board.service;
 
+import api.board.dto.member.MemberDto;
+import api.board.dto.member.SignUpDto;
 import api.board.dto.security.JwtToken;
 import api.board.repository.MemberRepository;
 import api.board.security.JwtTokenProvider;
@@ -8,8 +10,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -18,7 +24,20 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final PasswordEncoder passwordEncoder;
 
+
+    @Transactional
+    public MemberDto signup(SignUpDto signUpDto) {
+        if (memberRepository.existsByLoginId(signUpDto.getLoginId())) {
+            throw new IllegalArgumentException("이미 사용중인 ID입니다.");
+        }
+        //password암호화
+        String encodedPassword = passwordEncoder.encode(signUpDto.getPassword());
+        ArrayList<String> roles = new ArrayList<>();
+        roles.add("USER");
+        return MemberDto.toDto(memberRepository.save(signUpDto.toEntity(encodedPassword, roles)));
+    }
     @Transactional
     public JwtToken signIn(String loginId, String password) {
         // 1.username + password 를 기반으로 Authentication 객체 생성
