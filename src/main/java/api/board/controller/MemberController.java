@@ -17,18 +17,18 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/members")
+@RequestMapping("/member")
 public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/sign-up")
-    public ResponseEntity<MemberDto> signup(@RequestBody SignUpDto signUpDto) {
+    public ResponseEntity<MemberDto> signUp(@RequestBody SignUpDto signUpDto) {
         MemberDto savedMemberDto = memberService.signup(signUpDto);
         return ResponseEntity.ok(savedMemberDto);
     }
-    @PostMapping("/sign-in")
-    public JwtToken signin(@RequestBody SignDto signDto) {
-        String loginId = signDto.getLoginId();
+    @PostMapping("/login")
+    public JwtToken signIn(@RequestBody SignDto signDto) {
+        String loginId = signDto.getEmail();
         String password = signDto.getPassword();
         JwtToken jwtToken = memberService.signIn(loginId, password);
         log.info("request loginId = {}, password = {}", loginId, password);
