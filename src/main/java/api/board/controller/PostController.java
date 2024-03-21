@@ -26,13 +26,8 @@ public class PostController {
         return ResponseEntity.ok(posts);
     }
     @PostMapping
-    public ResponseEntity<Long> addPost(@RequestBody PostAddDto postAddDto) {
-        Long postId = postService.addPost(postAddDto);
-        log.info("postId={}",postId);
-        if (postId == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>(postId,HttpStatus.OK);
+    public ResponseEntity<String> addPost(@RequestBody PostAddDto postAddDto) {
+        return new ResponseEntity<>(postService.addPost(postAddDto));
     }
 
     @GetMapping("/{postId}")
