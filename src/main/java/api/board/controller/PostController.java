@@ -55,6 +55,9 @@ public class PostController {
         if (httpStatus.equals(HttpStatus.NOT_FOUND)) {
             return new ResponseEntity<>("이미 삭제된 게시글입니다.",httpStatus);
         }
+        if (httpStatus.equals(HttpStatus.BAD_REQUEST)) {
+            return new ResponseEntity<>("로그인 되지 않은 사용자입니다.",httpStatus);
+        }
         return new ResponseEntity<>(httpStatus);
     }
 
@@ -63,6 +66,9 @@ public class PostController {
         HttpStatus httpStatus = postService.updateComment(commentId, commentDto);
         if (httpStatus.equals(HttpStatus.NOT_FOUND)) {
             return new ResponseEntity<>("이미 삭제된 댓글입니다.",httpStatus);
+        }
+        if (httpStatus.equals(HttpStatus.BAD_REQUEST)) {
+            return new ResponseEntity<>("수정할 수 있는 권한이 없습니다..",httpStatus);
         }
         return new ResponseEntity<>(httpStatus);
     }
@@ -73,6 +79,10 @@ public class PostController {
         if (httpStatus.equals(HttpStatus.NOT_FOUND)) {
             return new ResponseEntity<>("이미 삭제된 댓글입니다.",httpStatus);
         }
+        if (httpStatus.equals(HttpStatus.BAD_REQUEST)) {
+            return new ResponseEntity<>("삭제할 수 있는 권한이 없습니다..",httpStatus);
+        }
+
         return new ResponseEntity<>(httpStatus);
     }
 

@@ -92,31 +92,45 @@ public class PostService {
 
     @Transactional
     public HttpStatus addComment(Long postId, CommentDto commentDto) {
-        Optional<Post> findPost = postRepository.findById(postId);
-        if (findPost.isEmpty()) {
-            return HttpStatus.NOT_FOUND;
+        String memberLoginId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Optional<Member> findMember = memberRepository.findByLoginId(memberLoginId);
+        if (findMember.isPresent()) {
+            Optional<Post> findPost = postRepository.findById(postId);
+            if (findPost.isEmpty()) {
+                return HttpStatus.NOT_FOUND;
+            }
+            commentRepository.save(commentDto.toEntity(findPost.get(),findMember.get()));
+            return HttpStatus.OK;
         }
-        commentRepository.save(commentDto.toEntity(findPost.get()));
-        return HttpStatus.OK;
+        return HttpStatus.BAD_REQUEST;
     }
 
     @Transactional
     public HttpStatus updateComment(Long commentId, CommentDto commentDto) {
         Optional<Comment> findComment = commentRepository.findById(commentId);
+        String memberLoginId = SecurityContextHolder.getContext().getAuthentication().getName();
         if (findComment.isEmpty()) {
             return HttpStatus.NOT_FOUND;
         }
-        findComment.get().updateComment(commentDto);
+        Comment comment = findComment.get();
+        if (!comment.getMember().getLoginId().equals(memberLoginId)) {
+            return HttpStatus.BAD_REQUEST;
+        }
+        comment.updateComment(commentDto);
         return HttpStatus.OK;
     }
     @Transactional
     public HttpStatus deleteComment(Long commentId) {
         Optional<Comment> findComment = commentRepository.findById(commentId);
+        String memberLoginId = SecurityContextHolder.getContext().getAuthentication().getName();
         if (findComment.isPresent()) {
-            commentRepository.delete(findComment.get());
+            Comment comment = findComment.get();
+            if (!comment.getMember().getLoginId().equals(memberLoginId)) {
+                return HttpStatus.BAD_REQUEST;
+            }
+            commentRepository.delete(comment);
             return HttpStatus.OK;
         }
-
         return HttpStatus.NOT_FOUND;
 
     }
