@@ -1,5 +1,6 @@
 package api.board.entity;
 
+import api.board.dto.member.MemberUpdateDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 public class Member implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "member_Id",updatable = false,unique = true,nullable = false)
+    @Column(name = "member_Id")
     private Long id;
     @Column(nullable = false)
     private String username;
@@ -28,6 +29,13 @@ public class Member implements UserDetails {
     private String loginId;
     @Column(nullable = false)
     private String password;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE,orphanRemoval = true)
+    private List<Post> postList;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Comment> commentList;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
     private List<String> roles = new ArrayList<>();
@@ -58,5 +66,9 @@ public class Member implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public void update(MemberUpdateDto memberUpdateDto) {
+        this.username = memberUpdateDto.getUsername();
     }
 }

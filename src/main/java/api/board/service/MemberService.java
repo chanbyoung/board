@@ -1,20 +1,25 @@
 package api.board.service;
 
 import api.board.dto.member.MemberDto;
+import api.board.dto.member.MemberUpdateDto;
 import api.board.dto.member.SignUpDto;
 import api.board.dto.security.JwtToken;
+import api.board.entity.Member;
 import api.board.repository.MemberRepository;
 import api.board.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -50,5 +55,31 @@ public class MemberService {
 
         //3.인증 정보를 기반으로 JWT 토큰 생성
         return jwtTokenProvider.generateToken(authenticate);
+    }
+
+    public MemberDto getMember() {
+        String memberLoginId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Optional<Member> findMember = memberRepository.findByLoginId(memberLoginId);
+        return findMember.map(MemberDto::toDto).orElse(null);
+    }
+    @Transactional
+    public HttpStatus updateMember(MemberUpdateDto memberUpdateDto) {
+        String memberLoginId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Optional<Member> findMember = memberRepository.findByLoginId(memberLoginId);
+        if (findMember.isPresent()) {
+            findMember.get().update(memberUpdateDto);
+            return HttpStatus.OK;
+        }
+        return HttpStatus.NOT_FOUND;
+    }
+    @Transactional
+    public HttpStatus deleteMember() {
+        String memberLoginId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Optional<Member> findMember = memberRepository.findByLoginId(memberLoginId);
+        if (findMember.isPresent()) {
+            memberRepository.delete(findMember.get());
+            return HttpStatus.OK;
+        }
+        return HttpStatus.NOT_FOUND;
     }
 }
