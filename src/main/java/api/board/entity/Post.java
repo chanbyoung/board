@@ -10,6 +10,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Builder
@@ -23,7 +26,8 @@ public class Post {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
-
+    @OneToMany(mappedBy = "post", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<Heart> heartList = new ArrayList<>();
     @NotBlank
     private String title;
     @NotBlank
@@ -34,5 +38,9 @@ public class Post {
     public void updatePost(PostUpdateDto postUpdateDto) {
         this.title = postUpdateDto.getTitle();
         this.content = postUpdateDto.getContent();
+    }
+
+    public void addHeart(Heart heart) {
+        this.heartList.add(heart);
     }
 }

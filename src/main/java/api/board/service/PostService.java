@@ -3,6 +3,7 @@ package api.board.service;
 import api.board.dto.comment.CommentDto;
 import api.board.dto.post.*;
 import api.board.entity.Comment;
+import api.board.entity.Heart;
 import api.board.entity.Member;
 import api.board.entity.Post;
 import api.board.repository.CommentRepository;
@@ -132,6 +133,25 @@ public class PostService {
             return HttpStatus.OK;
         }
         return HttpStatus.NOT_FOUND;
+
+    }
+    @Transactional
+    public HttpStatus addHeart(Long postId) {
+        Optional<Post> findPost = postRepository.findById(postId);
+        String memberLoginId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Optional<Member> findMember = memberRepository.findByLoginId(memberLoginId);
+        if (findMember.isPresent() && findPost.isPresent()) {
+            Post post = findPost.get();
+            Member member = findMember.get();
+            Heart heart = Heart.builder().
+                    post(post)
+                    .member(
+                            findMember.get()).build();
+            post.addHeart(heart);
+            return HttpStatus.OK;
+        }
+        return HttpStatus.BAD_REQUEST;
+
 
     }
 }
