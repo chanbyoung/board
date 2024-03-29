@@ -145,8 +145,7 @@ public class PostService {
             Member member = findMember.get();
             Heart heart = Heart.builder().
                     post(post)
-                    .member(
-                            findMember.get()).build();
+                    .member(member).build();
             post.addHeart(heart);
             return HttpStatus.OK;
         }

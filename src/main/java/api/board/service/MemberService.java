@@ -5,7 +5,10 @@ import api.board.dto.member.MemberUpdateDto;
 import api.board.dto.member.SignUpDto;
 import api.board.dto.security.JwtToken;
 import api.board.entity.Member;
+import api.board.entity.Post;
+import api.board.repository.HeartRepository;
 import api.board.repository.MemberRepository;
+import api.board.repository.PostRepository;
 import api.board.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -27,6 +31,7 @@ import java.util.Optional;
 @Slf4j
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final HeartRepository heartRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
@@ -60,7 +65,13 @@ public class MemberService {
     public MemberDto getMember() {
         String memberLoginId = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<Member> findMember = memberRepository.findByLoginId(memberLoginId);
-        return findMember.map(MemberDto::toDto).orElse(null);
+        if (findMember.isPresent()) {
+            Member member = findMember.get();
+            MemberDto memberDto = MemberDto.toDto(member);
+            List<Post> heartPostByMemberId = heartRepository.findHeartPostByMemberId(member.getId());
+            return memberDto.updateHeartList(heartPostByMemberId);
+        }
+        return null;
     }
     @Transactional
     public HttpStatus updateMember(MemberUpdateDto memberUpdateDto) {
